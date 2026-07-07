@@ -1,4 +1,4 @@
-package com.daniel.task_manager_api.controller;
+package com.daniel.task.manager.api.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

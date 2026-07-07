@@ -1,4 +1,4 @@
-package com.daniel.task_manager_api;
+package com.daniel.task.manager.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

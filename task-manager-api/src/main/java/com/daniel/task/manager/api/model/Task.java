@@ -1,4 +1,4 @@
-package com.daniel.task_manager_api.model;
+package com.daniel.task.manager.api.model;
 
 public class Task {
     private Long id;

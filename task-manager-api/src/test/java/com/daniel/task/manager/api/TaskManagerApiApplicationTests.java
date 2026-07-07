@@ -1,4 +1,4 @@
-package com.daniel.task_manager_api;
+package com.daniel.task.manager.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
