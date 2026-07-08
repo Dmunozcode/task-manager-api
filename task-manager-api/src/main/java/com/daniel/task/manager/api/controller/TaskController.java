@@ -41,4 +41,27 @@ public class TaskController {
         tasks.removeIf(task -> task.getId().equals(id));
     }
 
+    @PutMapping("/{id}")
+    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask){
+        for (Task task : tasks){
+            if (task.getId().equals(id)){
+                task.setTitle(updatedTask.getTitle());
+                task.setDescription(updatedTask.getDescription());
+                task.setCompleted(updatedTask.isCompleted());
+                return task;
+            }
+        }
+        return null;
+    }
+
+    @PatchMapping("/{id}/complete")
+    public Task completeTask(@PathVariable Long id){
+        for (Task task : tasks) {
+            if (task.getId().equals(id)) {
+                task.markAsCompleted();
+                return task;
+            }
+        }
+        return null;
+    }
 }
