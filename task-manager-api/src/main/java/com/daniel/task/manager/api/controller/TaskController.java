@@ -26,4 +26,19 @@ public class TaskController {
         return newTask;
     }
 
+    @GetMapping("/{id}")
+    public Task getTaskById(@PathVariable Long id) {
+        for (Task task : tasks) {
+            if(task.getId().equals(id)) {
+                return task;
+            }
+        }
+        return null;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteTaskById(@PathVariable Long id) {
+        tasks.removeIf(task -> task.getId().equals(id));
+    }
+
 }
