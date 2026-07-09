@@ -1,7 +1,9 @@
 package com.daniel.task.manager.api.service;
 
 import com.daniel.task.manager.api.model.Task;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +31,15 @@ public class TaskService {
                 return task;
             }
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
     }
 
     public void deleteTaskById(Long id) {
-        tasks.removeIf(task -> task.getId().equals(id));
+        boolean removed = tasks.removeIf(task -> task.getId().equals(id));
+
+        if (!removed) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+        }
     }
 
     public Task updateTask( Long id, Task updatedTask){
@@ -45,7 +51,7 @@ public class TaskService {
                 return task;
             }
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
     }
 
     public Task completeTask(Long id){
@@ -55,7 +61,7 @@ public class TaskService {
                 return task;
             }
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
     }
 
 }
