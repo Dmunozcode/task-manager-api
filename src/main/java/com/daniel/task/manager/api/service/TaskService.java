@@ -19,6 +19,7 @@ public class TaskService {
     }
 
     public Task createTask(Task task) {
+        validateTask(task);
         Task newTask = new Task(nextId, task.getTitle(), task.getDescription());
         tasks.add(newTask);
         nextId++;
@@ -43,6 +44,7 @@ public class TaskService {
     }
 
     public Task updateTask( Long id, Task updatedTask){
+        validateTask(updatedTask);
         for (Task task : tasks){
             if (task.getId().equals(id)){
                 task.setTitle(updatedTask.getTitle());
@@ -62,6 +64,16 @@ public class TaskService {
             }
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
+    }
+
+    private void validateTask(Task task) {
+        if (task.getTitle() == null || task.getTitle().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task title is required");
+        }
+
+        if (task.getDescription() == null || task.getDescription().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task description is required");
+        }
     }
 
 }
