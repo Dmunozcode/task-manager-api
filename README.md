@@ -1,14 +1,15 @@
 # Task Manager API
 
-Task Manager API is a basic REST API built with Java and Spring Boot.
+Task Manager API is a REST API built with Java and Spring Boot to manage tasks.
 
-It allows users to create, read, update, complete, and delete tasks using HTTP endpoints. This project is part of my backend learning path and focuses on understanding the fundamentals of REST APIs, controllers, request bodies, path variables, and basic in-memory data handling.
+The project allows users to create, list, search, update, complete, and delete tasks through HTTP endpoints. It also includes basic validation, error handling, a service layer, and unit tests with JUnit.
 
 ## Tech Stack
 
 - Java 21
 - Spring Boot
 - Maven
+- JUnit 5
 - Postman
 
 ## Features
@@ -17,21 +18,34 @@ It allows users to create, read, update, complete, and delete tasks using HTTP e
 - Create tasks
 - List all tasks
 - Find a task by ID
-- Update a task
+- Update task data
 - Mark a task as completed
-- Delete a task
+- Delete tasks
+- Basic input validation
+- Basic error handling with proper HTTP status codes
+- Unit tests for the service layer
 
 ## Project Structure
 
 ```text
-src/main/java
-└── com.daniel.task.manager.api
-    ├── controller
-    │   ├── HealthController.java
-    │   └── TaskController.java
-    ├── model
-    │   └── Task.java
-    └── TaskManagerApiApplication.java
+src
+├── main
+│   └── java
+│       └── com.daniel.task.manager.api
+│           ├── controller
+│           │   ├── HealthController.java
+│           │   └── TaskController.java
+│           ├── model
+│           │   └── Task.java
+│           ├── service
+│           │   └── TaskService.java
+│           └── TaskManagerApiApplication.java
+└── test
+    └── java
+        └── com.daniel.task.manager.api
+            ├── service
+            │   └── TaskServiceTest.java
+            └── TaskManagerApiApplicationTests.java
 ```
 
 ## Task Model
@@ -61,6 +75,18 @@ A task contains the following fields:
 
 ## Example Requests
 
+### Health Check
+
+```http
+GET /health
+```
+
+Example response:
+
+```text
+Task Manager API is running
+```
+
 ### Create a Task
 
 ```http
@@ -68,10 +94,65 @@ POST /tasks
 Content-Type: application/json
 ```
 
+Request body:
+
 ```json
 {
   "title": "Learn Spring Boot",
   "description": "Create GET and POST endpoints"
+}
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "title": "Learn Spring Boot",
+  "description": "Create GET and POST endpoints",
+  "completed": false
+}
+```
+
+### Get All Tasks
+
+```http
+GET /tasks
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Learn Spring Boot",
+    "description": "Create GET and POST endpoints",
+    "completed": false
+  }
+]
+```
+
+If there are no tasks, the API returns an empty list:
+
+```json
+[]
+```
+
+### Get Task By ID
+
+```http
+GET /tasks/1
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "title": "Learn Spring Boot",
+  "description": "Create GET and POST endpoints",
+  "completed": false
 }
 ```
 
@@ -82,11 +163,24 @@ PUT /tasks/1
 Content-Type: application/json
 ```
 
+Request body:
+
 ```json
 {
   "title": "Learn REST APIs",
   "description": "Update an existing task",
-  "completed": true
+  "completed": false
+}
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "title": "Learn REST APIs",
+  "description": "Update an existing task",
+  "completed": false
 }
 ```
 
@@ -96,10 +190,100 @@ Content-Type: application/json
 PATCH /tasks/1/complete
 ```
 
+Example response:
+
+```json
+{
+  "id": 1,
+  "title": "Learn REST APIs",
+  "description": "Update an existing task",
+  "completed": true
+}
+```
+
 ### Delete a Task
 
 ```http
 DELETE /tasks/1
+```
+
+## Validation
+
+The API validates task data when creating or updating tasks.
+
+A task must have:
+
+- A non-empty title
+- A non-empty description
+
+Invalid request example:
+
+```json
+{
+  "title": "",
+  "description": "Invalid task example"
+}
+```
+
+Response:
+
+```text
+400 Bad Request
+```
+
+## Error Handling
+
+The API returns proper HTTP status codes for basic error cases.
+
+| Status Code | Meaning | Example |
+|------------|---------|---------|
+| 400 Bad Request | Invalid task data | Empty title or description |
+| 404 Not Found | Task does not exist | Searching for `/tasks/999` |
+
+Example:
+
+```http
+GET /tasks/999
+```
+
+Response:
+
+```text
+404 Not Found
+```
+
+## Testing
+
+Unit tests are implemented with JUnit for the service layer.
+
+The tests cover:
+
+- Creating tasks
+- Returning all tasks
+- Returning an empty task list
+- Finding a task by ID
+- Updating a task
+- Completing a task
+- Deleting a task
+- Handling missing tasks
+- Validating empty title and description
+
+Run tests with Maven Wrapper:
+
+```bash
+./mvnw test
+```
+
+On Windows:
+
+```bash
+mvnw.cmd test
+```
+
+Or in PowerShell:
+
+```powershell
+.\mvnw.cmd test
 ```
 
 ## How to Run
@@ -107,7 +291,7 @@ DELETE /tasks/1
 Clone the repository:
 
 ```bash
-git clone https://github.com/Dmunozcode/task-manager-api.git
+git clone https://github.com/YOUR_USERNAME/task-manager-api.git
 ```
 
 Go into the project folder:
@@ -128,6 +312,12 @@ On Windows:
 mvnw.cmd spring-boot:run
 ```
 
+Or in PowerShell:
+
+```powershell
+.\mvnw.cmd spring-boot:run
+```
+
 The API will be available at:
 
 ```text
@@ -137,16 +327,18 @@ http://localhost:8080
 ## Current Limitations
 
 - Data is stored in memory, so tasks are lost when the application restarts.
-- Error handling is still basic.
 - There is no database integration yet.
+- Error responses use Spring Boot's default error format.
 
 ## Next Improvements
 
-- Add proper error handling with `404 Not Found`
-- Add input validation
-- Move business logic to a service layer
-- Add unit tests
-- Add database persistence with JPA
+- API documentation with Swagger/OpenAPI.
+- Data persistence using Spring Data JPA.
+- PostgreSQL database integration.
+- Repository layer using JpaRepository.
+- Improved validation using Bean Validation.
+- Global error handling for clearer API responses.
+- Additional tests for the service and controller layers.
 
 ## Author
 
