@@ -9,6 +9,8 @@ The project allows users to create, list, search, update, complete, and delete t
 - Java 21
 - Spring Boot
 - Maven
+- Springdoc OpenAPI
+- Swagger UI
 - JUnit 5
 - Postman
 
@@ -24,6 +26,8 @@ The project allows users to create, list, search, update, complete, and delete t
 - Basic input validation
 - Basic error handling with proper HTTP status codes
 - Unit tests for the service layer
+- Interactive API documentation with Swagger UI
+- OpenAPI specification generated automatically
 
 ## Project Structure
 
@@ -72,6 +76,17 @@ A task contains the following fields:
 | PUT | `/tasks/{id}` | Updates a task by ID |
 | PATCH | `/tasks/{id}/complete` | Marks a task as completed |
 | DELETE | `/tasks/{id}` | Deletes a task by ID |
+
+## API Documentation
+
+The API includes interactive documentation generated with Springdoc OpenAPI.
+
+Swagger UI allows developers to explore the available endpoints, inspect request and response schemas, and execute HTTP requests directly from the browser.
+
+With the application running, the documentation is available at:
+
+- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
 ## Example Requests
 
@@ -291,7 +306,7 @@ Or in PowerShell:
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/task-manager-api.git
+git clone https://github.com/Dmunozcode/task-manager-api.git
 ```
 
 Go into the project folder:
@@ -332,7 +347,6 @@ http://localhost:8080
 
 ## Next Improvements
 
-- API documentation with Swagger/OpenAPI.
 - Data persistence using Spring Data JPA.
 - PostgreSQL database integration.
 - Repository layer using JpaRepository.
