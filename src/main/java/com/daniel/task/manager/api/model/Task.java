@@ -22,6 +22,12 @@ public class Task {
         this.completed = false;
     }
 
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.completed = false;
+    }
+
     public void markAsCompleted() {
         this.completed = true;
     }
