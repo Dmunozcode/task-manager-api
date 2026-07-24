@@ -1,5 +1,7 @@
 package com.daniel.task.manager.api.service;
 
+import com.daniel.task.manager.api.dto.TaskRequest;
+import com.daniel.task.manager.api.dto.TaskResponse;
 import com.daniel.task.manager.api.model.Task;
 import com.daniel.task.manager.api.repository.TaskRepository;
 import org.springframework.http.HttpStatus;
@@ -16,17 +18,20 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<TaskResponse> getAllTasks() {
+        return taskRepository.findAll()
+                .stream()
+                .map(task -> toResponse(task))
+                .toList();
     }
 
-    public Task createTask(Task task) {
-        validateTask(task);
-        Task newTask = new Task(task.getTitle(), task.getDescription());
-        return taskRepository.save(newTask);
+    public TaskResponse createTask(TaskRequest request) {
+        Task task = toEntity(request);
+        Task savedTask = taskRepository.save(task);
+        return toResponse(savedTask);
     }
 
-    public Task getTaskById(Long id) {
+    public Task findTaskById(Long id) {
         return taskRepository.findById(id).
                 orElseThrow(() ->
                         new ResponseStatusException(
@@ -36,40 +41,45 @@ public class TaskService {
                 );
     }
 
+    public TaskResponse getTaskById(Long id) {
+        Task task = findTaskById(id);
+        return toResponse(task);
+    }
+
     public void deleteTaskById(Long id) {
-        Task task = getTaskById(id);
+        Task task = findTaskById(id);
 
         taskRepository.delete(task);
     }
 
-    public Task updateTask( Long id, Task updatedTask){
-        validateTask(updatedTask);
-
-        Task existingTask = getTaskById(id);
+    public TaskResponse updateTask( Long id, TaskRequest updatedTask){
+        Task existingTask = findTaskById(id);
 
         existingTask.setTitle(updatedTask.getTitle());
         existingTask.setDescription(updatedTask.getDescription());
-        existingTask.setCompleted(updatedTask.isCompleted());
 
-        return taskRepository.save(existingTask);
+        Task savedTask = taskRepository.save(existingTask);
+
+        return toResponse(savedTask);
     }
 
-    public Task completeTask(Long id){
-        Task task = getTaskById(id);
-
+    public TaskResponse completeTask(Long id){
+        Task task = findTaskById(id);
         task.markAsCompleted();
-
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+        return toResponse(savedTask);
     }
 
-    private void validateTask(Task task) {
-        if (task.getTitle() == null || task.getTitle().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task title is required");
-        }
+    private TaskResponse toResponse(Task task) {
+        return new TaskResponse(
+                task.getId(), task.getTitle(), task.getDescription(), task.isCompleted()
+        );
+    }
 
-        if (task.getDescription() == null || task.getDescription().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task description is required");
-        }
+    private Task toEntity(TaskRequest request) {
+        return new Task(
+                request.getTitle(), request.getDescription()
+        );
     }
 
 }

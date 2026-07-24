@@ -1,7 +1,10 @@
 package com.daniel.task.manager.api.controller;
 
+import com.daniel.task.manager.api.dto.TaskRequest;
+import com.daniel.task.manager.api.dto.TaskResponse;
 import com.daniel.task.manager.api.model.Task;
 import com.daniel.task.manager.api.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,17 +20,17 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getAllTasks() {
+    public List<TaskResponse> getAllTasks() {
         return taskService.getAllTasks();
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
+    public TaskResponse createTask(@Valid @RequestBody TaskRequest task) {
         return taskService.createTask(task);
     }
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Long id) {
+    public TaskResponse getTaskById(@PathVariable Long id) {
         return taskService.getTaskById(id);
     }
 
@@ -37,12 +40,12 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
+    public TaskResponse updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequest updatedTask) {
         return taskService.updateTask(id,updatedTask);
     }
 
     @PatchMapping("/{id}/complete")
-    public Task completeTask(@PathVariable Long id) {
+    public TaskResponse completeTask(@PathVariable Long id) {
         return taskService.completeTask(id);
     }
 }

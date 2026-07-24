@@ -8,18 +8,13 @@ public class Task {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 100)
     private String title;
+    @Column(nullable = false, length = 500)
     private String description;
     private boolean completed;
 
-    public Task() {
-    }
-
-    public Task(Long id, String title, String description) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.completed = false;
+    protected Task() {
     }
 
     public Task(String title, String description) {
