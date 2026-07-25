@@ -2,11 +2,10 @@ package com.daniel.task.manager.api.service;
 
 import com.daniel.task.manager.api.dto.TaskRequest;
 import com.daniel.task.manager.api.dto.TaskResponse;
+import com.daniel.task.manager.api.exception.TaskNotFoundException;
 import com.daniel.task.manager.api.model.Task;
 import com.daniel.task.manager.api.repository.TaskRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,20 +30,18 @@ public class TaskService {
         return toResponse(savedTask);
     }
 
-    public Task findTaskById(Long id) {
+    private Task findTaskById(Long id) {
         return taskRepository.findById(id).
                 orElseThrow(() ->
-                        new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "Task not found"
-                        )
-                );
+                        new TaskNotFoundException(id));
     }
 
     public TaskResponse getTaskById(Long id) {
         Task task = findTaskById(id);
         return toResponse(task);
     }
+
+
 
     public void deleteTaskById(Long id) {
         Task task = findTaskById(id);
