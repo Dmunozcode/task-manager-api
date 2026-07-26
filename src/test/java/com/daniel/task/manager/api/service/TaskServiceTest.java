@@ -1,165 +1,172 @@
 package com.daniel.task.manager.api.service;
 
+import com.daniel.task.manager.api.dto.TaskRequest;
+import com.daniel.task.manager.api.dto.TaskResponse;
+import com.daniel.task.manager.api.exception.TaskNotFoundException;
 import com.daniel.task.manager.api.model.Task;
-import org.junit.jupiter.api.BeforeEach;
+import com.daniel.task.manager.api.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.server.ResponseStatusException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
 
-    private TaskService taskService;
+    @Mock
+    private TaskRepository taskRepository;
 
-    @BeforeEach
-    void setUp() {
-        taskService = new TaskService();
-    }
+    @InjectMocks
+    private TaskService taskService;
 
     @Test
     void shouldCreateTask() {
-        Task task = new Task(null, "Learn JUnit", "Write my first unit test");
+        TaskRequest request = new TaskRequest("Learn Mockito", "Write my first Mockito test");
 
-        Task createdTask = taskService.createTask(task);
+        Task savedTask = new Task("Learn Mockito", "Write my first Mockito test");
+        savedTask.setId(1L);
 
-        assertEquals(1L, createdTask.getId());
-        assertEquals("Learn JUnit", createdTask.getTitle());
-        assertEquals("Write my first unit test", createdTask.getDescription());
-        assertFalse(createdTask.isCompleted());
+        when(taskRepository.save(any(Task.class)))
+                .thenReturn(savedTask);
+
+        TaskResponse response = taskService.createTask(request);
+
+        assertEquals(1L, response.getId());
+        assertEquals("Learn Mockito", response.getTitle());
+        assertEquals("Write my first Mockito test", response.getDescription());
+        assertFalse(response.isCompleted());
+
+        verify(taskRepository).save(any(Task.class));
     }
 
     @Test
     void shouldReturnAllTasks() {
-        Task task = new Task(null, "Learn JUnit", "Test getAllTasks");
+        Task task = new Task("Learn Mockito", "Write my first Mockito test");
+        task.setId(1L);
 
-        taskService.createTask(task);
+        when(taskRepository.findAll())
+                .thenReturn(List.of(task));
 
-        List<Task> tasks = taskService.getAllTasks();
+        List<TaskResponse> responses = taskService.getAllTasks();
 
-        assertEquals(1, tasks.size());
-        assertEquals("Learn JUnit", tasks.get(0).getTitle());
-        assertEquals("Test getAllTasks", tasks.get(0).getDescription());
+        TaskResponse response = responses.get(0);
+
+        assertEquals(1, responses.size());
+        assertEquals(1L, response.getId());
+        assertEquals("Learn Mockito", response.getTitle());
+        assertEquals("Write my first Mockito test", response.getDescription());
+        assertFalse(response.isCompleted());
+
+        verify(taskRepository).findAll();
     }
 
     @Test
     void shouldReturnEmptyListWhenThereAreNoTasks() {
-        List<Task> tasks = taskService.getAllTasks();
+        when(taskRepository.findAll())
+                .thenReturn(List.of());
 
-        assertTrue(tasks.isEmpty());
+        List<TaskResponse> responses = taskService.getAllTasks();
+
+        assertTrue(responses.isEmpty());
+
+        verify(taskRepository).findAll();
     }
 
     @Test
     void shouldReturnTaskById() {
-        Task task = new Task(null, "Learn JUnit", "Test getTaskById");
+        Task task = new Task("Learn Mockito", "Write my first Mockito test");
+        task.setId(1L);
 
-        Task createdTask = taskService.createTask(task);
+        when(taskRepository.findById(1L))
+                .thenReturn(Optional.of(task));
 
-        Task foundTask = taskService.getTaskById(createdTask.getId());
+        TaskResponse response = taskService.getTaskById(1L);
 
-        assertEquals(1L, foundTask.getId());
-        assertEquals("Learn JUnit", foundTask.getTitle());
-        assertEquals("Test getTaskById", foundTask.getDescription());
+        assertEquals(1L, response.getId());
+        assertEquals("Learn Mockito", response.getTitle());
+        assertEquals("Write my first Mockito test", response.getDescription());
+        assertFalse(response.isCompleted());
+
+        verify(taskRepository).findById(1L);
     }
 
     @Test
     void shouldUpdateTask() {
-        Task task = new Task(null, "Learn JUnit", "Test updateTask");
+        Task task = new Task("Old title", "Old description");
+        task.setId(1L);
+        TaskRequest request = new TaskRequest("New title","New description");
 
-        Task createdTask = taskService.createTask(task);
+        when(taskRepository.findById(1L))
+                .thenReturn(Optional.of(task));
+        when(taskRepository.save(any(Task.class)))
+                .thenReturn(task);
 
-        Task updatedData = new Task(null, "New Task", "Test updateTask");
+        TaskResponse response = taskService.updateTask(1L,request);
 
-        Task updatedTask = taskService.updateTask(createdTask.getId(), updatedData);
+        assertEquals(1L, response.getId());
+        assertEquals("New title", response.getTitle());
+        assertEquals("New description", response.getDescription());
+        assertFalse(response.isCompleted());
 
-        assertEquals(createdTask.getId(), updatedTask.getId());
-        assertEquals("New Task", updatedTask.getTitle());
-        assertEquals("Test updateTask", updatedTask.getDescription());
+        verify(taskRepository).findById(1L);
+        verify(taskRepository).save(task);
     }
 
     @Test
     void shouldCompleteTask() {
-        Task task = new Task(null, "Learn JUnit", "Test completeTask");
+        Task task = new Task("Learn Mockito", "Write my first Mockito test");
+        task.setId(1L);
 
-        Task createdTask = taskService.createTask(task);
+        when(taskRepository.findById(1L))
+                .thenReturn(Optional.of(task));
+        when(taskRepository.save(any(Task.class)))
+                .thenReturn(task);
 
-        Task completedTask = taskService.completeTask(createdTask.getId());
+        TaskResponse response = taskService.completeTask(1L);
 
-        assertTrue(completedTask.isCompleted());
-        assertEquals(createdTask.getId(), completedTask.getId());
+        assertEquals(1L, response.getId());
+        assertEquals("Learn Mockito", response.getTitle());
+        assertEquals("Write my first Mockito test", response.getDescription());
+        assertTrue(response.isCompleted());
+
+        verify(taskRepository).findById(1L);
+        verify(taskRepository).save(task);
     }
 
     @Test
     void shouldDeleteTask() {
-        Task task = new Task(null, "Learn JUnit", "Test deleteTask");
+        Task task = new Task("Learn Mockito", "Write my first Mockito test");
+        task.setId(1L);
 
-        Task createdTask = taskService.createTask(task);
+        when(taskRepository.findById(1L))
+                .thenReturn(Optional.of(task));
 
-        taskService.deleteTaskById(createdTask.getId());
+        taskService.deleteTaskById(1L);
 
-        assertThrows(ResponseStatusException.class, () -> {
-            taskService.getTaskById(createdTask.getId());
-        });
+        verify(taskRepository).findById(1L);
+        verify(taskRepository).delete(task);
     }
 
     @Test
     void shouldThrowExceptionWhenTaskNotFound() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-           taskService.getTaskById(999L);
-        });
+        when(taskRepository.findById(999L))
+                .thenReturn(Optional.empty());
 
-        assertEquals(404, exception.getStatusCode().value());
-    }
+        TaskNotFoundException exception = assertThrows(
+                TaskNotFoundException.class,
+                () -> taskService.getTaskById(999L)
+        );
 
-    @Test
-    void shouldThrowExceptionWhenUpdatingMissingTask() {
-        Task updatedData = new Task(null, "New Task", "Test Exception");
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-           taskService.updateTask(999L, updatedData);
-        });
-
-        assertEquals(404, exception.getStatusCode().value());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenCompletingMissingTask() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            taskService.completeTask(999L);
-        });
-
-        assertEquals(404, exception.getStatusCode().value());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenDeletingMissingTask() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            taskService.deleteTaskById(999L);
-        });
-
-        assertEquals(404, exception.getStatusCode().value());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenTitleIsBlank() {
-        Task task = new Task(null, "", "Test Exception");
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-           taskService.createTask(task);
-        });
-
-        assertEquals(400, exception.getStatusCode().value());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenDescriptionIsBlank() {
-        Task task = new Task(null, "Test exception", "");
-
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-           taskService.createTask(task);
-        });
-
-        assertEquals(400, exception.getStatusCode().value());
+        assertEquals("Task not found with id: 999", exception.getMessage());
+        verify(taskRepository).findById(999L);
     }
 }

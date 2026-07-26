@@ -41,8 +41,6 @@ public class TaskService {
         return toResponse(task);
     }
 
-
-
     public void deleteTaskById(Long id) {
         Task task = findTaskById(id);
 
