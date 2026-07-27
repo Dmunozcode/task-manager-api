@@ -1,106 +1,132 @@
 # Task Manager API
 
-Task Manager API is a REST API built with Java and Spring Boot to manage tasks.
+Task Manager API is a RESTful API built with Java and Spring Boot for managing tasks.
 
-The project allows users to create, list, search, update, complete, and delete tasks through HTTP endpoints. It also includes basic validation, error handling, a service layer, and unit tests with JUnit.
-
-## Tech Stack
-
-- Java 21
-- Spring Boot
-- Maven
-- Springdoc OpenAPI
-- Swagger UI
-- JUnit 5
-- Postman
+The project follows a layered architecture and includes persistent storage with PostgreSQL, DTO-based request and response models, Bean Validation, global exception handling, interactive OpenAPI documentation, and unit tests with JUnit and Mockito.
 
 ## Features
 
-- Health check endpoint
 - Create tasks
 - List all tasks
 - Find a task by ID
 - Update task data
 - Mark a task as completed
 - Delete tasks
-- Basic input validation
-- Basic error handling with proper HTTP status codes
-- Unit tests for the service layer
+- Persist tasks in PostgreSQL
+- Validate incoming requests
+- Return structured JSON error responses
 - Interactive API documentation with Swagger UI
-- OpenAPI specification generated automatically
+- Unit tests for the service layer
+- PostgreSQL environment managed with Docker Compose
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Java 21 | Programming language |
+| Spring Boot | Application framework |
+| Spring Web MVC | REST API and HTTP endpoints |
+| Spring Data JPA | Repository and persistence abstraction |
+| Hibernate | JPA implementation and object-relational mapping |
+| PostgreSQL 18 | Relational database |
+| Bean Validation | Request validation |
+| Springdoc OpenAPI | OpenAPI specification generation |
+| Swagger UI | Interactive API documentation |
+| JUnit 5 | Unit testing |
+| Mockito | Mocking repository dependencies in unit tests |
+| Maven | Build and dependency management |
+| Docker Compose | PostgreSQL container orchestration |
+
+## Architecture
+
+The application follows a layered structure:
+
+```text
+HTTP Request
+     |
+     v
+Controller
+     |
+     v
+Service
+     |
+     v
+Repository
+     |
+     v
+PostgreSQL
+```
+
+DTOs are used to separate the public API contract from the persistence entity:
+
+- `TaskRequest` represents incoming task data.
+- `TaskResponse` represents data returned by the API.
+- `Task` is the JPA entity persisted in PostgreSQL.
 
 ## Project Structure
 
 ```text
-src
-├── main
-│   └── java
-│       └── com.daniel.task.manager.api
-│           ├── controller
-│           │   ├── HealthController.java
-│           │   └── TaskController.java
-│           ├── model
-│           │   └── Task.java
-│           ├── service
-│           │   └── TaskService.java
-│           └── TaskManagerApiApplication.java
-└── test
-    └── java
-        └── com.daniel.task.manager.api
-            ├── service
-            │   └── TaskServiceTest.java
-            └── TaskManagerApiApplicationTests.java
-```
-
-## Task Model
-
-A task contains the following fields:
-
-```json
-{
-  "id": 1,
-  "title": "Learn Spring Boot",
-  "description": "Create a basic REST API",
-  "completed": false
-}
+task-manager-api/
+|-- src/
+|   |-- main/
+|   |   |-- java/com/daniel/task/manager/api/
+|   |   |   |-- controller/
+|   |   |   |   |-- HealthController.java
+|   |   |   |   `-- TaskController.java
+|   |   |   |-- dto/
+|   |   |   |   |-- TaskRequest.java
+|   |   |   |   `-- TaskResponse.java
+|   |   |   |-- exception/
+|   |   |   |   |-- ErrorResponse.java
+|   |   |   |   |-- GlobalExceptionHandler.java
+|   |   |   |   `-- TaskNotFoundException.java
+|   |   |   |-- model/
+|   |   |   |   `-- Task.java
+|   |   |   |-- repository/
+|   |   |   |   `-- TaskRepository.java
+|   |   |   |-- service/
+|   |   |   |   `-- TaskService.java
+|   |   |   `-- TaskManagerApiApplication.java
+|   |   `-- resources/
+|   |       `-- application.properties
+|   `-- test/
+|       `-- java/com/daniel/task/manager/api/service/
+|           `-- TaskServiceTest.java
+|-- .env.example
+|-- .gitignore
+|-- docker-compose.yml
+|-- mvnw
+|-- mvnw.cmd
+|-- pom.xml
+`-- README.md
 ```
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Checks if the API is running |
+|---|---|---|
+| GET | `/health` | Checks whether the API is running |
 | GET | `/tasks` | Returns all tasks |
-| POST | `/tasks` | Creates a new task |
+| POST | `/tasks` | Creates a task |
 | GET | `/tasks/{id}` | Returns a task by ID |
-| PUT | `/tasks/{id}` | Updates a task by ID |
+| PUT | `/tasks/{id}` | Updates a task |
 | PATCH | `/tasks/{id}/complete` | Marks a task as completed |
-| DELETE | `/tasks/{id}` | Deletes a task by ID |
+| DELETE | `/tasks/{id}` | Deletes a task |
 
-## API Documentation
+## Task Representation
 
-The API includes interactive documentation generated with Springdoc OpenAPI.
+A task returned by the API has the following structure:
 
-Swagger UI allows developers to explore the available endpoints, inspect request and response schemas, and execute HTTP requests directly from the browser.
-
-With the application running, the documentation is available at:
-
-- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+```json
+{
+  "id": 1,
+  "title": "Learn Spring Boot",
+  "description": "Build a task management REST API",
+  "completed": false
+}
+```
 
 ## Example Requests
-
-### Health Check
-
-```http
-GET /health
-```
-
-Example response:
-
-```text
-Task Manager API is running
-```
 
 ### Create a Task
 
@@ -109,12 +135,10 @@ POST /tasks
 Content-Type: application/json
 ```
 
-Request body:
-
 ```json
 {
-  "title": "Learn Spring Boot",
-  "description": "Create GET and POST endpoints"
+  "title": "Learn Docker Compose",
+  "description": "Run PostgreSQL inside a Docker container"
 }
 ```
 
@@ -123,8 +147,8 @@ Example response:
 ```json
 {
   "id": 1,
-  "title": "Learn Spring Boot",
-  "description": "Create GET and POST endpoints",
+  "title": "Learn Docker Compose",
+  "description": "Run PostgreSQL inside a Docker container",
   "completed": false
 }
 ```
@@ -141,34 +165,23 @@ Example response:
 [
   {
     "id": 1,
-    "title": "Learn Spring Boot",
-    "description": "Create GET and POST endpoints",
+    "title": "Learn Docker Compose",
+    "description": "Run PostgreSQL inside a Docker container",
     "completed": false
   }
 ]
 ```
 
-If there are no tasks, the API returns an empty list:
+When no tasks exist, the API returns an empty JSON array:
 
 ```json
 []
 ```
 
-### Get Task By ID
+### Get a Task by ID
 
 ```http
 GET /tasks/1
-```
-
-Example response:
-
-```json
-{
-  "id": 1,
-  "title": "Learn Spring Boot",
-  "description": "Create GET and POST endpoints",
-  "completed": false
-}
 ```
 
 ### Update a Task
@@ -178,24 +191,10 @@ PUT /tasks/1
 Content-Type: application/json
 ```
 
-Request body:
-
 ```json
 {
-  "title": "Learn REST APIs",
-  "description": "Update an existing task",
-  "completed": false
-}
-```
-
-Example response:
-
-```json
-{
-  "id": 1,
-  "title": "Learn REST APIs",
-  "description": "Update an existing task",
-  "completed": false
+  "title": "Learn Docker",
+  "description": "Understand containers, images, and volumes"
 }
 ```
 
@@ -203,17 +202,6 @@ Example response:
 
 ```http
 PATCH /tasks/1/complete
-```
-
-Example response:
-
-```json
-{
-  "id": 1,
-  "title": "Learn REST APIs",
-  "description": "Update an existing task",
-  "completed": true
-}
 ```
 
 ### Delete a Task
@@ -224,110 +212,139 @@ DELETE /tasks/1
 
 ## Validation
 
-The API validates task data when creating or updating tasks.
+Incoming task requests are validated using Bean Validation.
 
-A task must have:
+Validation rules:
 
-- A non-empty title
-- A non-empty description
+- `title` is required and must not exceed 100 characters.
+- `description` is required and must not exceed 500 characters.
 
-Invalid request example:
+Invalid request:
 
 ```json
 {
   "title": "",
-  "description": "Invalid task example"
+  "description": ""
 }
 ```
 
-Response:
+Example validation response:
 
-```text
-400 Bad Request
+```json
+{
+  "timestamp": "2026-07-27T12:00:00",
+  "status": 400,
+  "message": "Validation failed",
+  "errors": {
+    "title": "Title is required",
+    "description": "Description is required"
+  }
+}
 ```
 
 ## Error Handling
 
-The API returns proper HTTP status codes for basic error cases.
+A global exception handler produces consistent JSON error responses.
 
-| Status Code | Meaning | Example |
-|------------|---------|---------|
-| 400 Bad Request | Invalid task data | Empty title or description |
-| 404 Not Found | Task does not exist | Searching for `/tasks/999` |
+| Status | Situation |
+|---|---|
+| `400 Bad Request` | Request validation fails |
+| `404 Not Found` | The requested task does not exist |
 
-Example:
+Example not-found response:
 
-```http
-GET /tasks/999
+```json
+{
+  "timestamp": "2026-07-27T12:00:00",
+  "status": 404,
+  "message": "Task not found with id: 999",
+  "errors": {}
+}
 ```
 
-Response:
+## API Documentation
 
-```text
-404 Not Found
-```
+Springdoc OpenAPI automatically generates the API specification and Swagger UI.
 
-## Testing
+With the application running:
 
-Unit tests are implemented with JUnit for the service layer.
+- Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+- OpenAPI JSON: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
-The tests cover:
+Swagger UI can be used to inspect schemas and execute requests directly from the browser.
 
-- Creating tasks
-- Returning all tasks
-- Returning an empty task list
-- Finding a task by ID
-- Updating a task
-- Completing a task
-- Deleting a task
-- Handling missing tasks
-- Validating empty title and description
+## Running the Project
 
-Run tests with Maven Wrapper:
+### Prerequisites
 
-```bash
-./mvnw test
-```
+- Java 21
+- Docker Desktop
+- Git
 
-On Windows:
+PostgreSQL does not need to be installed locally because it runs in a Docker container.
 
-```bash
-mvnw.cmd test
-```
-
-Or in PowerShell:
-
-```powershell
-.\mvnw.cmd test
-```
-
-## How to Run
-
-Clone the repository:
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Dmunozcode/task-manager-api.git
-```
-
-Go into the project folder:
-
-```bash
 cd task-manager-api
 ```
 
-Run the application:
+### 2. Configure the Database Password
+
+Create a `.env` file in the project root based on `.env.example`:
+
+```env
+DB_PASSWORD=your_development_password
+```
+
+The `.env` file is ignored by Git and must not be committed.
+
+The Spring Boot application also requires `DB_PASSWORD` as an environment variable. Its value must match the password configured in `.env`.
+
+In PowerShell:
+
+```powershell
+$env:DB_PASSWORD="your_development_password"
+```
+
+In Bash:
+
+```bash
+export DB_PASSWORD="your_development_password"
+```
+
+When running the application from IntelliJ IDEA, add `DB_PASSWORD` to the environment variables of the Spring Boot run configuration.
+
+### 3. Start PostgreSQL
+
+```bash
+docker compose up -d
+```
+
+Check the container status:
+
+```bash
+docker compose ps
+```
+
+PostgreSQL is exposed on:
+
+```text
+localhost:5433
+```
+
+Docker creates the `task_manager` database automatically and stores its data in the `postgres_data` volume.
+
+### 4. Run the Application
+
+On Linux or macOS:
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-On Windows:
-
-```bash
-mvnw.cmd spring-boot:run
-```
-
-Or in PowerShell:
+On Windows PowerShell:
 
 ```powershell
 .\mvnw.cmd spring-boot:run
@@ -339,23 +356,61 @@ The API will be available at:
 http://localhost:8080
 ```
 
-## Current Limitations
+### 5. Stop PostgreSQL
 
-- Data is stored in memory, so tasks are lost when the application restarts.
-- There is no database integration yet.
-- Error responses use Spring Boot's default error format.
+```bash
+docker compose down
+```
 
-## Next Improvements
+This removes the container and Docker network but preserves the database volume.
 
-- Data persistence using Spring Data JPA.
-- PostgreSQL database integration.
-- Repository layer using JpaRepository.
-- Improved validation using Bean Validation.
-- Global error handling for clearer API responses.
-- Additional tests for the service and controller layers.
+To remove the container and all stored database data:
+
+```bash
+docker compose down -v
+```
+
+## Testing
+
+Service-layer unit tests are implemented with JUnit 5 and Mockito.
+
+Mockito isolates the service from PostgreSQL by replacing `TaskRepository` with a mock dependency.
+
+The tests cover:
+
+- Creating a task
+- Returning all tasks
+- Returning an empty task list
+- Finding a task by ID
+- Updating a task
+- Completing a task
+- Deleting a task
+- Handling a missing task
+
+Run the tests with:
+
+```bash
+./mvnw test
+```
+
+On Windows PowerShell:
+
+```powershell
+.\mvnw.cmd test
+```
+
+## Future Improvements
+
+- Add controller and integration tests
+- Use Testcontainers for PostgreSQL integration tests
+- Dockerize the Spring Boot application
+- Add pagination, filtering, and sorting
+- Add task deadlines and priorities
+- Add authentication and authorization
+- Add a continuous integration pipeline
 
 ## Author
 
-Daniel
+Daniel Muñoz
 
-Backend learning project built with Java and Spring Boot.
+Backend development learning project built with Java and Spring Boot.

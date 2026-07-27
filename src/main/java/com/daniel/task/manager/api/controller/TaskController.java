@@ -2,7 +2,6 @@ package com.daniel.task.manager.api.controller;
 
 import com.daniel.task.manager.api.dto.TaskRequest;
 import com.daniel.task.manager.api.dto.TaskResponse;
-import com.daniel.task.manager.api.model.Task;
 import com.daniel.task.manager.api.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
