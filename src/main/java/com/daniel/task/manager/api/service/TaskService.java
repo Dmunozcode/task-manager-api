@@ -20,7 +20,7 @@ public class TaskService {
     public List<TaskResponse> getAllTasks() {
         return taskRepository.findAll()
                 .stream()
-                .map(task -> toResponse(task))
+                .map(this::toResponse)
                 .toList();
     }
 
@@ -47,7 +47,7 @@ public class TaskService {
         taskRepository.delete(task);
     }
 
-    public TaskResponse updateTask( Long id, TaskRequest updatedTask){
+    public TaskResponse updateTask(Long id, TaskRequest updatedTask){
         Task existingTask = findTaskById(id);
 
         existingTask.setTitle(updatedTask.getTitle());
@@ -58,7 +58,7 @@ public class TaskService {
         return toResponse(savedTask);
     }
 
-    public TaskResponse completeTask(Long id){
+    public TaskResponse completeTask(Long id) {
         Task task = findTaskById(id);
         task.markAsCompleted();
         Task savedTask = taskRepository.save(task);

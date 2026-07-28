@@ -27,10 +27,6 @@ public class Task {
         this.completed = true;
     }
 
-    public void markAsPending() {
-        this.completed = false;
-    }
-
     public Long getId() {
         return id;
     }
@@ -57,10 +53,6 @@ public class Task {
 
     public boolean isCompleted() {
         return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
     }
 }
 
